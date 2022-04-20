@@ -1,3 +1,4 @@
+<?php require "db.php"; ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,6 +22,11 @@
 			</li>
 		</ul>
 		<ul class="navbar-nav ml-auto">
+			<li class="nav-item">
+				<span class="navbar-text">
+					Logged in as <?=$_SESSION["username"]?>
+				</span>
+			</li>
 			<li class="nav-item">
 				<a class="nav-link" href="logout.php">Logout</a>
 			</li>

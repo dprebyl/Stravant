@@ -16,6 +16,11 @@
 			<div class="col text-center">
 				<img src="logo.png" class="my-4" alt="Stravan't">
 				<form method="POST" action="login.php">
+					<?php if (isset($_GET["error"])): ?>
+						<div class="alert alert-danger" role="alert">
+							Invalid username and/or password. Maybe it would be easier to just <a href="steal.php">steal an account</a>?
+						</div>
+					<?php endif; ?>
 					<div class="form-group row">
 						<label for="username" class="col-sm-2 col-form-label">Username</label>
 						<div class="col-sm-10">
