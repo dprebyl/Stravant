@@ -1,9 +1,5 @@
 <!DOCTYPE html>
-<?php
-	require "db.php";
-	// TODO: Check the user has permission (their own activity or an activity of someone who friended them)
-	$activity = $db->query("SELECT * FROM activity WHERE id = ?", [$_GET["id"]]);
-?>
+<?php require "db.php"; ?>
 <html>
 <head>
 	<title>Stravan't</title>
@@ -24,7 +20,7 @@
 			<li class="nav-item">
 				<a class="nav-link" href="home.php">Home</a>
 			</li>
-			<li class="nav-item">
+			<li class="nav-item active">
 				<a class="nav-link" href="statistics.php">Records and statistics</a>
 			</li>
 		</ul>
@@ -41,18 +37,11 @@
 	</nav>
 	<div class="container">
 		<div class="row">
-			<div class="col-sm-8">
+			<div class="col">
 				<h1>
-					TODO: Activity name
+					Records and statistics
 				</h1>
-				TODO: Map of activity
-			</div>
-			<div class="col-sm-4">
-				<h1>
-					Details
-					<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#edit-details">Edit</a>
-				</h1>
-				TODO: Categories, miles, etc. go here
+				TODO: Things like longest activity, excuses to use order by and group by
 			</div>
 		</div>
 	</div>

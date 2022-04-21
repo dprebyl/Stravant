@@ -1,5 +1,18 @@
-<?php require "db.php"; ?>
 <!DOCTYPE html>
+<?php
+	require "db.php";
+	if (isset($_GET["friend"])) {
+		// TODO: Check the friend is valid. If so, display the friend's activities and categories, but read only (no delete)
+		$username = $_GET["friend"];
+	}
+	else {
+		$username = $_SESSION["username"];
+	}
+	
+	if (isset($_GET["category"])) {
+		// TODO: Handle filtering by category
+	}
+?>
 <html>
 <head>
 	<title>Stravan't</title>
@@ -20,6 +33,9 @@
 			<li class="nav-item active">
 				<a class="nav-link" href="home.php">Home</a>
 			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="statistics.php">Records and statistics</a>
+			</li>
 		</ul>
 		<ul class="navbar-nav ml-auto">
 			<li class="nav-item">
@@ -36,28 +52,31 @@
 		<div class="row">
 			<div class="col-sm-8">
 				<h1>
-					Activities
+					<?=isset($_GET["category"]) ? $_GET["category"] : "All"?> activities of <?=$username?>
 					<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#upload">Upload</a>
 				</h1>
+				<!-- TODO: Map of all activities -->
 				<table class="table table-striped">
 					<thead>
 						<tr>
-							<th>Date/Time</th><th>Name</th><th>Distance</th><th>Duration</th>
+							<th>Date/Time</th><th>Name</th><th>Distance</th><th>Duration</th><th></th>
 						</tr>
 					</thead>
 					<tbody>
 						<?php
+							// TODO: SQL, maybe join could be used here to get color of a category or something
 							$activities = [
-								["start_time" => time(), "name" => "Foo", "miles" => 4.2, "duration" => 3600],
-								["start_time" => time(), "name" => "Bar", "miles" => 6.9, "duration" => 7200],
-								["start_time" => time(), "name" => "Baz", "miles" => 12, "duration" => 9600],
+								["id" => 1, "start_time" => time(), "name" => "Foo", "miles" => 4.2, "duration" => 3600],
+								["id" => 2, "start_time" => time(), "name" => "Bar", "miles" => 6.9, "duration" => 7200],
+								["id" => 3, "start_time" => time(), "name" => "Baz", "miles" => 12, "duration" => 9600],
 							];
 							foreach ($activities as $activity) {
 								echo "<tr>";
 								echo "<td>" . date("n/d/y g:ia", $activity["start_time"]) . "</td>";
-								echo "<td>" . $activity["name"] . "</td>";
+								echo "<td><a href='view.php?id=" . $activity["id"] . "'>" . $activity["name"] . "</a></td>";
 								echo "<td>" . $activity["miles"] . "</td>";
 								echo "<td>" . gmdate("G:i", $activity["duration"]) . "</td>";
+								echo "<td class='text-right'><a href='delete-activity.php?activity=" . $activity["id"] . "' class='text-danger font-weight-bold'>&times;</a></td>";
 								echo "</tr>";
 							}
 						?>
@@ -67,24 +86,27 @@
 			<div class="col-sm-4">
 				<h1>
 					Friends
-					<a href="#" class="btn btn-primary float-right mt-2">Add</a>
+					<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#add-friend">Add</a>
 				</h1>
 				<table class="table table-sm table-striped">
 					<thead>
 						<tr>
-							<th>Username</th>
+							<th>Username</th><th></th>
 						</tr>
 					</thead>
 					<tbody>
 						<?php
+							// TODO
+							// $friends = $db->query("SELECT friend FROM friend WHERE username = ?", [$username]);
 							$friends = [
-								["username" => "Foo"],
-								["username" => "Bar"],
-								["username" => "Baz"],
+								["friend" => "Foo"],
+								["friend" => "Bar"],
+								["friend" => "Baz"],
 							];
 							foreach ($friends as $friend) {
 								echo "<tr>";
-								echo "<td>" . $friend["username"] . "</td>";
+								echo "<td><a href='home.php?friend=" . $friend["friend"] . "'>" . $friend["friend"] . "</a></td>";
+								echo "<td class='text-right'><a href='delete-friend.php?friend=" . $friend["friend"] . "' class='text-danger font-weight-bold'>&times;</a></td>";
 								echo "</tr>";
 							}
 						?>
@@ -92,17 +114,20 @@
 				</table>
 				<h1>
 					Categories
-					<a href="#" class="btn btn-primary float-right mt-2">Add</a>
+					<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#add-category">Add</a>
 				</h1>
 				<table class="table table-sm table-striped">
 					<thead>
 						<tr>
 							<th>Category</th>
 							<th>Color</th>
+							<th></th>
 						</tr>
 					</thead>
 					<tbody>
 						<?php
+							// TODO
+							// $categories = $db->query("SELECT name, color FROM category WHERE username = ?", [$username]);
 							$categories = [
 								["name" => "Foo", "color" => "red"],
 								["name" => "Bar", "color" => "green"],
@@ -110,8 +135,11 @@
 							];
 							foreach ($categories as $category) {
 								echo "<tr>";
-								echo "<td>" . $category["name"] . "</td>";
+								$url = "home.php?category=" . $category["name"];
+								if (isset($_GET["friend"])) $url .= "&friend=" . $_GET["friend"];
+								echo "<td><a href='$url'>" . $category["name"] . "</td>";
 								echo "<td>" . $category["color"] . "</td>";
+								echo "<td class='text-right'><a href='delete-category.php?category=" . $category["name"] . "' class='text-danger font-weight-bold'>&times;</a></td>";
 								echo "</tr>";
 							}
 						?>
@@ -132,14 +160,71 @@
 				</div>
 				<form method="POST" action="upload.php" enctype="multipart/form-data">
 					<div class="modal-body">
-							<div class="form-group">
-								<label for="file">Select GPX file (or drag and drop):</label>
-								<input type="file" class="form-control-file" id="file" name="file">
-							</div>
+						<div class="form-group">
+							<label for="file">Select GPX file (or drag and drop):</label>
+							<input type="file" class="form-control-file" id="file" name="file">
+						</div>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
 						<button type="submit" class="btn btn-success">Upload</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<div class="modal fade" id="add-friend" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Add a friend</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<form method="POST" action="add-friend.php">
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="friend">Username:</label>
+							<input type="text" class="form-control" id="friend" name="friend">
+						</div>
+						<p>
+							Note: They must also add you as a friend before you can view their activities.
+						</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-success">Add</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<div class="modal fade" id="add-category" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Add a category</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<form method="POST" action="add-category.php">
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="name">Name:</label>
+							<input type="text" class="form-control" id="name" name="name">
+						</div>
+						<div class="form-group">
+							<label for="color">Color:</label>
+							<input type="color" class="form-control" id="color" name="color">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-success">Add</button>
 					</div>
 				</form>
 			</div>
