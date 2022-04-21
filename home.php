@@ -35,7 +35,10 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-8">
-				<h1>Activities</h1>
+				<h1>
+					Activities
+					<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#upload">Upload</a>
+				</h1>
 				<table class="table table-striped">
 					<thead>
 						<tr>
@@ -62,7 +65,10 @@
 				</table>
 			</div>
 			<div class="col-sm-4">
-				<h1>Friends</h1>
+				<h1>
+					Friends
+					<a href="#" class="btn btn-primary float-right mt-2">Add</a>
+				</h1>
 				<table class="table table-sm table-striped">
 					<thead>
 						<tr>
@@ -84,7 +90,10 @@
 						?>
 					</tbody>
 				</table>
-				<h1>Categories</h1>
+				<h1>
+					Categories
+					<a href="#" class="btn btn-primary float-right mt-2">Add</a>
+				</h1>
 				<table class="table table-sm table-striped">
 					<thead>
 						<tr>
@@ -111,5 +120,31 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="modal fade" id="upload" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Upload a new activity</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<form method="POST" action="upload.php" enctype="multipart/form-data">
+					<div class="modal-body">
+							<div class="form-group">
+								<label for="file">Select GPX file (or drag and drop):</label>
+								<input type="file" class="form-control-file" id="file" name="file">
+							</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-success">Upload</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
 </body>
 </html>
