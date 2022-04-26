@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <?php
+	require "db.php";
 	$error = false;
 	if (isset($_POST["username"])) {
-		if ($_POST["password"] != $_POST["password-confirm"]) {
-			$error = "Passwords do not match";
-		}
-		// TODO: Check if username taken or password too weak, if ok then insert into DB and redirect to login
+		$_SESSION["username"] = $_POST["username"];
+		header("Location: home.php");
 	}
 ?>
 <html>
@@ -32,9 +31,7 @@
 						<div class="col-sm-10">
 							<select type="text" class="form-control" id="username" name="username">
 								<?php
-									// TODO: Test
-									// $usernames = array_column($db->query("SELECT username FROM user"), "user");
-									$usernames = ["Bob", "Joe", "Fred"];
+									$usernames = array_column($db->query("SELECT username FROM user"), "username");
 									foreach ($usernames as $username) {
 										echo "<option value='$username'>$username</option>";
 									}

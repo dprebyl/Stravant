@@ -1,4 +1,23 @@
 <!DOCTYPE html>
+<?php
+	require "db.php";
+
+	$error = false;
+
+	if (isset($_POST["username"])) {
+		$user = $db->query("SELECT password FROM user WHERE username = ?", [$_POST["username"]]);
+		if (count($user) != 1) {
+			$error = "Username not found";
+		}
+		elseif (!password_verify($_POST["password"], $user[0]["password"])) {
+			$error = "Incorrect password";
+		}
+		else {
+			$_SESSION["username"] = $_POST["username"];
+			header("Location: home.php");
+		}
+	}
+?>
 <html>
 <head>
 	<title>Stravan't</title>
@@ -15,10 +34,10 @@
 		<div class="row">
 			<div class="col text-center">
 				<img src="logo.png" class="my-4" alt="Stravan't">
-				<form method="POST" action="login.php">
-					<?php if (isset($_GET["error"])): ?>
+				<form method="POST">
+					<?php if ($error): ?>
 						<div class="alert alert-danger" role="alert">
-							Invalid username and/or password. Maybe it would be easier to just <a href="steal.php">steal an account</a>?
+							<?=$error?>. Maybe it would be easier to just <a href="steal.php">steal an account</a>?
 						</div>
 					<?php endif; ?>
 					<div class="form-group row">
