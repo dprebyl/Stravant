@@ -95,6 +95,11 @@
 						</tr>
 					</thead>
 					<tbody>
+						<?php if (isset($_GET["error"])): ?>
+							<div class="alert alert-danger" role="alert">
+								<?=$_GET["error"]?>.
+							</div>
+						<?php endif; ?>
 						<?php
 							$friends = $db->query("SELECT friend FROM friendship WHERE user = ?", [$username]);
 							foreach ($friends as $friend) {
@@ -167,14 +172,6 @@
 			</div>
 		</div>
 	</div>
-	<script>
-		// https://stackoverflow.com/a/42960051/7587147
-		$(document).ready(function() {
-			if(window.location.href.indexOf('#add-friend') != -1) {
-				$('#add-friend').modal('show');
-			}
-		});
-	</script>
 	<div class="modal fade" id="add-friend" tabindex="-1">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -186,11 +183,6 @@
 				</div>
 				<form method="POST" action="add-friend.php">
 					<div class="modal-body">
-						<?php if (isset($_GET["error"])): ?>
-							<div class="alert alert-danger" role="alert">
-								<?=$_GET["error"]?>.
-							</div>
-						<?php endif; ?>
 						<div class="form-group">
 							<label for="friend">Username:</label>
 							<input type="text" class="form-control" id="friend" name="friend">
