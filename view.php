@@ -1,8 +1,17 @@
 <!DOCTYPE html>
 <?php
 	require "db.php";
-	// TODO: Check the user has permission (their own activity or an activity of someone who friended them)
-	$activity = $db->query("SELECT * FROM activity WHERE id = ?", [$_GET["id"]]);
+	
+	$activity = $db->query("SELECT *, ST_AsText(gps_track) AS gps_track
+							FROM activity
+							WHERE activity_id = ? AND username = ?", // TODO: Also allow viewing activities of friends
+							[$_GET["id"], $_SESSION["username"]])[0];
+
+	// Convert GPS track from "LINESTRING(lat lon,lat lon,...)" to array
+	$coords = [];
+	foreach (explode(",", substr($activity["gps_track"], 11, -1)) as $latlon) {
+		$coords[] = explode(" ", $latlon);
+	}
 ?>
 <html>
 <head>
@@ -43,10 +52,8 @@
 	</nav>
 	<div class="container">
 		<div class="row">
-			<div class="col-sm-8">
-				<h1>
-					TODO: Activity name
-				</h1>
+			<div class="col-lg-8">
+				<h1><?=$activity["name"]?></h1>
 				<div id="map" style="height: 400px"></div>
 				<script>
 					const MAP_STYLES = [ // https://docs.mapbox.com/api/maps/styles/
@@ -82,10 +89,9 @@
 					// Select the first base layer by default
 					baseLayers[Object.keys(baseLayers)[0]].addTo(map);
 					
-					// TODO: Get these things from the database
-					let name = "TODO activity name"
-					let coords = [[38.9, -95.2], [39.0, -95.3], [39.0, -95.1]];
-					let color = "red";
+					let name = "<?=$activity["name"]?>"
+					let coords = <?=json_encode($coords)?>;
+					let color = "red"; // TODO: Based on the first category maybe?
 
 					let line = L.polyline(coords, {"color": color}).addTo(map);
 					let layers = {"Activity": line};
@@ -94,15 +100,60 @@
 					L.control.layers(baseLayers, layers).addTo(map); // User controls in top-right
 				</script>
 			</div>
-			<div class="col-sm-4">
+			<div class="col-lg-4">
 				<h1>
 					Details
-					<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#edit-details">Edit</a>
+					<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#edit">Edit</a>
 				</h1>
-				TODO: Categories, miles, etc. go here
+				<ul class="list-group">
+					<li class="list-group-item d-flex justify-content-between">
+						<b>Date/time</b>
+						<span><?=date("n/d/y g:ia", strtotime($activity["start_time"]))?></span>
+					</li>
+					<li class="list-group-item d-flex justify-content-between">
+						<b>Distance</b>
+						<span><?=number_format($activity["miles"], 2)?> mi</span>
+					</li>
+					<li class="list-group-item d-flex justify-content-between">
+						<b>Duration</b>
+						<span><?=gmdate("G:i:s", $activity["duration"])?></span>
+					</li>
+					<li class="list-group-item">
+						<b>Categories</b>
+						<div>TODO</div>
+					</li>
+					<li class="list-group-item">
+						<b>Description</b>
+						<div><?=$activity["description"]?></div>
+					</li>
+				</ul>
 			</div>
 		</div>
 	</div>
 
+	<div class="modal fade" id="edit" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Edit details</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<form method="POST" action="view.php">
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="file">TODO:</label>
+							<input type="text" class="form-control-file" id="file" name="file" value="TODO" disabled>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-success">Save changes</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 </body>
 </html>

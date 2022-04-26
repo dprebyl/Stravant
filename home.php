@@ -2,7 +2,7 @@
 <?php
 	require "db.php";
 	ensure_logged_in();
-	
+
 	if (isset($_GET["friend"])) {
 		// TODO: Check the friend is valid. If so, display the friend's activities and categories, but read only (no delete)
 		$username = $_GET["friend"];
@@ -66,19 +66,15 @@
 					</thead>
 					<tbody>
 						<?php
-							// TODO: SQL, maybe join could be used here to get color of a category or something
-							$activities = [
-								["id" => 1, "start_time" => time(), "name" => "Foo", "miles" => 4.2, "duration" => 3600],
-								["id" => 2, "start_time" => time(), "name" => "Bar", "miles" => 6.9, "duration" => 7200],
-								["id" => 3, "start_time" => time(), "name" => "Baz", "miles" => 12, "duration" => 9600],
-							];
+							// TODO: Maybe join could be used here to get color of a category or something, also could double-check friendship
+							$activities = $db->query("SELECT activity_id, name, start_time, miles, duration FROM activity WHERE username = ?", [$username]);
 							foreach ($activities as $activity) {
 								echo "<tr>";
-								echo "<td>" . date("n/d/y g:ia", $activity["start_time"]) . "</td>";
-								echo "<td><a href='view.php?id=" . $activity["id"] . "'>" . $activity["name"] . "</a></td>";
-								echo "<td>" . $activity["miles"] . "</td>";
+								echo "<td>" . date("n/d/y g:ia", strtotime($activity["start_time"])) . "</td>";
+								echo "<td><a href='view.php?id=" . $activity["activity_id"] . "'>" . $activity["name"] . "</a></td>";
+								echo "<td>" . number_format($activity["miles"], 2) . " mi</td>";
 								echo "<td>" . gmdate("G:i", $activity["duration"]) . "</td>";
-								echo "<td class='text-right'><a href='delete-activity.php?activity=" . $activity["id"] . "' class='text-danger font-weight-bold'>&times;</a></td>";
+								echo "<td class='text-right'><a href='delete-activity.php?activity=" . $activity["activity_id"] . "' class='text-danger font-weight-bold'>&times;</a></td>";
 								echo "</tr>";
 							}
 						?>
