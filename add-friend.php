@@ -13,5 +13,5 @@
 		}
 	}
 
-	header("Location: home.php?error=" . $error);
+	header("Location: home.php?friend_error=" . $error);
 ?>

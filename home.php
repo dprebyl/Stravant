@@ -95,9 +95,9 @@
 						</tr>
 					</thead>
 					<tbody>
-						<?php if (isset($_GET["error"])): ?>
+						<?php if (isset($_GET["friend_error"])): ?>
 							<div class="alert alert-danger" role="alert">
-								<?=$_GET["error"]?>.
+								<?=$_GET["friend_error"]?>.
 							</div>
 						<?php endif; ?>
 						<?php
