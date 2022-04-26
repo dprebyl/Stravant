@@ -12,13 +12,14 @@
 	<title>Stravan't</title>
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="libs/bootstrap.min.css">
 	<script src="libs/jquery.slim.min.js"></script>
 	<script src="libs/popper.min.js"></script>
 	<script src="libs/bootstrap.min.js"></script>
 </head>
-<body>
+<body class="pb-4">
 	<div class="container">
 		<div class="row">
 			<div class="col text-center">
