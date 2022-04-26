@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <?php
 	require "db.php";
+	ensure_logged_in();
 	
 	$activity = $db->query("SELECT *, ST_AsText(gps_track) AS gps_track
 							FROM activity
@@ -141,11 +142,20 @@
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
-				<form method="POST" action="view.php">
+				<form method="POST" action="edit.php">
+					<input type="hidden" name="activity_id" value="<?=$_GET["id"]?>">
 					<div class="modal-body">
 						<div class="form-group">
-							<label for="file">TODO:</label>
-							<input type="text" class="form-control-file" id="file" name="file" value="TODO" disabled>
+							<label for="name">Name:</label>
+							<input type="text" class="form-control" id="name" name="name" value="<?=$activity["name"]?>">
+						</div>
+						<div class="form-group">
+							<label for="categories">Categories (comma separated):</label>
+							<input type="text" class="form-control" id="categories" name="categories" value="TODO">
+						</div>
+						<div class="form-group">
+							<label for="description">Description:</label>
+							<textarea class="form-control" id="description" name="description"><?=$activity["description"]?></textarea>
 						</div>
 					</div>
 					<div class="modal-footer">
