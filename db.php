@@ -4,6 +4,9 @@
 
 	// Start the session to keep track of who's logged in
 	session_start();
+    function ensure_logged_in() {
+        if (empty($_SESSION["username"])) header("Location: index.php");
+    }
 	
 	class DBConn {
 		private $conn;

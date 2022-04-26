@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <?php
 	require "db.php";
+	ensure_logged_in();
+	
 	if (isset($_GET["friend"])) {
 		// TODO: Check the friend is valid. If so, display the friend's activities and categories, but read only (no delete)
 		$username = $_GET["friend"];
