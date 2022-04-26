@@ -11,13 +11,12 @@
     }
 
     $gpx = simplexml_load_file($file["tmp_name"]) or die("Failed to load file");
-    // TODO: Parse the GPX, insert into database, and redirect to view.php for the new activity
 	
-	$start = substr($gpx->metadata->time, 0, 20); // Time activity started, converted to SQL-friendly format
+	$start = $gpx->metadata->time; // Time activity started
 	$track = $gpx->trk;
 	$name = $track->name; // Name of activity
 	$type = $track->type; // e.g. cycling (TODO: maybe make this a category automatically?)
-    // TODO: Check if desc is present
+    $description = property_exists($track, "desc") ? $track->desc : $type;
 	
 	$points = []; // Array to contain all points
 	foreach ($track->trkseg->trkpt as $point) {
@@ -28,11 +27,17 @@
 		$points[] = [$time, $lat, $lon, $ele];
 	}
 
+    // How many seconds long the activity is (from the last track point)
+    $duration = $time - strtotime($start);
+
     // Convert points array to MySQL line string format
     $linestring = "LINESTRING(" . implode(",", array_map(function($point) { return $point[1] . " " . $point[2]; }, $points)) . ")";
 	
-	$db->query("INSERT INTO activity (username, start_time, name, gps_track) VALUES (?, ?, ?, ST_LineStringFromText(?))", [$_SESSION["username"], $start, $name, $linestring]);
+    // 4326 is the spatial reference system WGS84 used for the Earth
+	$id = $db->query("INSERT INTO activity (username, name, duration, description, start_time, gps_track) 
+                VALUES (?, ?, ?, ?, ?, ST_LineStringFromText(?, 4326))", 
+        [$_SESSION["username"], $name, $duration, $description, substr($start, 0, 20), $linestring]);
 	
-	// TODO: Get the primary key back
-	//header("Location: view.php?activity=");
+	if ($id) header("Location: view.php?activity=" . $id);
+    else die("Something went wrong");
 ?>
