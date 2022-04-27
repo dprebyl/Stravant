@@ -84,8 +84,8 @@
 			</div>
 			<script>
 				function removeFriend(friend){
-					document.getElementById("delete-friend-target").innerText=friend;
-					document.getElementById("delete-friend-form").action = "delete-friend.php?friend=" + friend; 
+					document.getElementById("delete-friend-target-text").innerText=friend;
+					document.getElementById("delete-friend-target").value = friend;
 				}
 			</script>
 			<!-- TODO: Display these horizontally on small screens https://stackoverflow.com/questions/65222546/can-bootstrap-columns-be-vertically-stacked -->
@@ -217,10 +217,11 @@
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
-				<form method="POST" action="delete-friend.php" id="delete-friend-form">
+				<form method="POST" action="delete-friend.php">
 					<div class="modal-body">
-						Remove friend <span id="delete-friend-target"></span>?
+						Remove friend <span id="delete-friend-target-text"></span>?
 					</div>
+					<input type="text" hidden id="delete-friend-target" name="friend" class="form-control" />
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
 						<button type="submit" class="btn btn-danger">Remove</button>
