@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <?php
 	require "db.php";
+	if (!isset($_SESSION["username"])) {
+		header("Location: index.php");
+		return;
+	}
+	
 	if (isset($_GET["friend"])) {
 		// TODO: Check the friend is valid. If so, display the friend's activities and categories, but read only (no delete)
 		$username = $_GET["friend"];
@@ -83,6 +88,12 @@
 					</tbody>
 				</table>
 			</div>
+			<script>
+				function removeFriend(friend){
+					document.getElementById("delete-friend-target").innerText=friend;
+					document.getElementById("delete-friend-form").action = "delete-friend.php?friend=" + friend; 
+				}
+			</script>
 			<div class="col-sm-4">
 				<h1>
 					Friends
@@ -95,17 +106,20 @@
 						</tr>
 					</thead>
 					<tbody>
-						<?php if (isset($_GET["friend_error"])): ?>
-							<div class="alert alert-danger" role="alert">
-								<?=$_GET["friend_error"]?>.
-							</div>
-						<?php endif; ?>
+						<?php
+							if (isset($_SESSION["friend_error"])) {
+								echo '<div class="alert alert-danger" role="alert">';
+								echo $_SESSION["friend_error"] . ".";
+								echo "</div>";
+								unset($_SESSION["friend_error"]);
+							}
+						?>
 						<?php
 							$friends = $db->query("SELECT friend FROM friendship WHERE user = ?", [$username]);
 							foreach ($friends as $friend) {
 								echo "<tr>";
 								echo "<td><a href='home.php?friend=" . $friend["friend"] . "'>" . $friend["friend"] . "</a></td>";
-								echo "<td class='text-right'><a href='delete-friend.php?friend=" . $friend["friend"] . "' class='text-danger font-weight-bold'>&times;</a></td>";
+								echo "<td class='text-right'><a href='#delete-friend' data-toggle='modal' data-target='#delete-friend' onclick='removeFriend(\"" . $friend["friend"] . "\")' class='text-danger font-weight-bold'>&times;</a></td>";
 								echo "</tr>";
 							}
 						?>
@@ -194,6 +208,27 @@
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
 						<button type="submit" class="btn btn-success">Add</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="delete-friend" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Remove Friend</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<form method="POST" action="delete-friend.php" id="delete-friend-form">
+					<div class="modal-body">
+						Remove friend <span id="delete-friend-target"></span>?
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-danger">Remove</button>
 					</div>
 				</form>
 			</div>
