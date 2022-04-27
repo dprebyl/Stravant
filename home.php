@@ -3,12 +3,19 @@
 	require "db.php";
 	ensure_logged_in();
 
-	if (isset($_GET["friend"])) {
-		// TODO: Check the friend is valid. If so, display the friend's activities and categories, but read only (no delete)
+	if (isset($_GET["friend"]) && $_GET["friend"] != $_SESSION["username"]) {
+		$self = false;
 		$username = $_GET["friend"];
+
+		// Check that the friend has friended the user (NOT the other way around)
+		// Someone has to friend you for you to see their activities
+		$permission = count($db->query("SELECT 1 FROM friendship WHERE user = ? AND friend = ?", 
+										[$_GET["friend"], $_SESSION["username"]])) > 0;
 	}
 	else {
 		$username = $_SESSION["username"];
+		$self = true;
+		$permission = true;
 	}
 	
 	if (isset($_GET["category"])) {
@@ -56,8 +63,18 @@
 			<div class="col-lg-8">
 				<h1>
 					<?=isset($_GET["category"]) ? $_GET["category"] : "All"?> activities of <?=$username?>
-					<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#upload">Upload</a>
+					<?php if ($self): ?>
+						<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#upload">Upload</a>
+					<?php endif; ?>
 				</h1>
+				<?php if (!$permission): ?>
+					<div class="alert alert-danger" role="alert">
+						<?=$username?> has not added you as a friend, so you cannot view their activities.
+					</div>
+				<?php 
+					$username = ""; // Prevents any of the selects from working (on purpose)
+					endif; 
+				?>
 				<!-- TODO: Map of all activities -->
 				<table class="table table-striped">
 					<thead>
@@ -79,7 +96,9 @@
 								echo "<td><a href='view.php?id=" . $activity["activity_id"] . "'>" . $activity["name"] . "</a></td>";
 								echo "<td>" . number_format($activity["miles"], 2) . " mi</td>";
 								echo "<td>" . gmdate("G:i", $activity["duration"]) . "</td>";
-								echo "<td class='text-right'><a href='delete-activity.php?activity=" . $activity["activity_id"] . "' class='text-danger font-weight-bold'>&times;</a></td>";
+								echo "<td class='text-right'>";
+								if ($self) echo "<a href='delete-activity.php?activity=" . $activity["activity_id"] . "' class='text-danger font-weight-bold'>&times;</a>";
+								echo "</td>";
 								echo "</tr>";
 							}
 						?>
@@ -108,7 +127,9 @@
 			<div class="col-lg-4">
 				<h1>
 					Friends
-					<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#add-friend">Add</a>
+					<?php if ($self): ?>
+						<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#add-friend">Add</a>
+					<?php endif; ?>
 				</h1>
 				<table class="table table-sm table-striped">
 					<thead>
@@ -130,7 +151,9 @@
 							foreach ($friends as $friend) {
 								echo "<tr>";
 								echo "<td><a href='home.php?friend=" . $friend["friend"] . "'>" . $friend["friend"] . "</a></td>";
-								echo "<td class='text-right'><a href='#delete-friend' data-toggle='modal' data-target='#delete-friend' onclick='removeFriend(\"" . $friend["friend"] . "\")' class='text-danger font-weight-bold'>&times;</a></td>";
+								echo "<td class='text-right'>";
+								if ($self) echo "<a href='#delete-friend' data-toggle='modal' data-target='#delete-friend' onclick='removeFriend(\"" . $friend["friend"] . "\")' class='text-danger font-weight-bold'>&times;</a>";
+								echo "</td>";
 								echo "</tr>";
 							}
 						?>
@@ -138,7 +161,9 @@
 				</table>
 				<h1>
 					Categories
-					<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#add-category">Add</a>
+					<?php if ($self): ?>
+						<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#add-category">Add</a>
+					<?php endif; ?>
 				</h1>
 				<table class="table table-sm table-striped">
 					<thead>
@@ -164,8 +189,12 @@
 								$url = "home.php?category=" . $category["name"];
 								if (isset($_GET["friend"])) $url .= "&friend=" . $_GET["friend"];
 								echo "<td><a href='$url' style='color:" . $category["color"] ."'>" . $category["name"] . "</td>";
-								echo "<td class='text-right'><a href='#add-category' data-toggle='modal' data-target='#add-category' onclick='updateCategory(\"" . $category["name"] . "\", \"" . $category["color"] . "\")'>edit</a></td>";
-								echo "<td class='text-right'><a href='#delete-category' data-toggle='modal' data-target='#delete-category' onclick='deleteCategory(\"" . $category["name"] . "\")' class='text-danger font-weight-bold'>&times;</a></td>";
+								echo "<td class='text-right'>";
+								if ($self) echo "<a href='#add-category' data-toggle='modal' data-target='#add-category' onclick='updateCategory(\"" . $category["name"] . "\", \"" . $category["color"] . "\")'>edit</a>";
+								echo "</td>";
+								echo "<td class='text-right'>";
+								if ($self) echo "<a href='#delete-category' data-toggle='modal' data-target='#delete-category' onclick='deleteCategory(\"" . $category["name"] . "\")' class='text-danger font-weight-bold'>&times;</a>";
+								echo "</td>";
 								echo "</tr>";
 							}
 						?>
