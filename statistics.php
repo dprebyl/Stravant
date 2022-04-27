@@ -57,28 +57,28 @@
 				<tbody>
 					<?php
 						echo "<tr>";
-						$dist = $db->query("select act.miles, act.username, act.name from activity as act join friendship as fr on act.username=fr.friend where fr.user=? or act.username=? order by act.miles asc", [$_SESSION["username"], $_SESSION["username"]])[0];
+						$dist = $db->query("select * from activity as act join friendship as fr on act.username=fr.friend where username=? or username in (select friend from friendship where user=?) order by act.miles desc", [$_SESSION["username"], $_SESSION["username"]])[0];
 						echo "<td>Greatest Distance</td>";
 						echo "<td>" . $dist["username"] . "</td>";
 						echo "<td>" . $dist["name"] . "</td>";
 						echo "<td>" . $dist["miles"] . "</td>";
 						echo "</tr>";
 						echo "<tr>";
-						$dist = $db->query("select act.miles, act.username, act.name from activity as act join friendship as fr on act.username=fr.friend where fr.user=? or act.username=? order by act.miles desc", [$_SESSION["username"], $_SESSION["username"]])[0];
+						$dist = $db->query("select * from activity as act join friendship as fr on act.username=fr.friend where username=? or username in (select friend from friendship where user=?) order by act.miles asc", [$_SESSION["username"], $_SESSION["username"]])[0];
 						echo "<td>Lowest Distance</td>";
 						echo "<td>" . $dist["username"] . "</td>";
 						echo "<td>" . $dist["name"] . "</td>";
 						echo "<td>" . $dist["miles"] . "</td>";
 						echo "</tr>";
 						echo "<tr>";
-						$dist = $db->query("select act.duration, act.username, act.name from activity as act join friendship as fr on act.username=fr.friend where fr.user=? or act.username=? order by act.duration asc", [$_SESSION["username"], $_SESSION["username"]])[0];
+						$dist = $db->query("select * from activity as act join friendship as fr on act.username=fr.friend where username=? or username in (select friend from friendship where user=?) order by act.duration desc", [$_SESSION["username"], $_SESSION["username"]])[0];
 						echo "<td>Greatest Duration</td>";
 						echo "<td>" . $dist["username"] . "</td>";
 						echo "<td>" . $dist["name"] . "</td>";
 						echo "<td>" . $dist["duration"] . "</td>";
 						echo "</tr>";
 						echo "<tr>";
-						$dist = $db->query("select act.duration, act.username, act.name from activity as act join friendship as fr on act.username=fr.friend where fr.user=? or act.username=? order by act.duration desc", [$_SESSION["username"], $_SESSION["username"]])[0];
+						$dist = $db->query("select * from activity as act join friendship as fr on act.username=fr.friend where username=? or username in (select friend from friendship where user=?) order by act.duration asc", [$_SESSION["username"], $_SESSION["username"]])[0];
 						echo "<td>Lowest Duration</td>";
 						echo "<td>" . $dist["username"] . "</td>";
 						echo "<td>" . $dist["name"] . "</td>";
