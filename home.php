@@ -82,6 +82,12 @@
 					</tbody>
 				</table>
 			</div>
+			<script>
+				function removeFriend(friend){
+					document.getElementById("delete-friend-target-text").innerText=friend;
+					document.getElementById("delete-friend-target").value = friend;
+				}
+			</script>
 			<!-- TODO: Display these horizontally on small screens https://stackoverflow.com/questions/65222546/can-bootstrap-columns-be-vertically-stacked -->
 			<div class="col-lg-4">
 				<h1>
@@ -96,17 +102,19 @@
 					</thead>
 					<tbody>
 						<?php
-							// TODO
-							// $friends = $db->query("SELECT friend FROM friend WHERE username = ?", [$username]);
-							$friends = [
-								["friend" => "Foo"],
-								["friend" => "Bar"],
-								["friend" => "Baz"],
-							];
+							if (isset($_SESSION["friend_error"])) {
+								echo '<div class="alert alert-danger" role="alert">';
+								echo $_SESSION["friend_error"] . ".";
+								echo "</div>";
+								unset($_SESSION["friend_error"]);
+							}
+						?>
+						<?php
+							$friends = $db->query("SELECT friend FROM friendship WHERE user = ?", [$username]);
 							foreach ($friends as $friend) {
 								echo "<tr>";
 								echo "<td><a href='home.php?friend=" . $friend["friend"] . "'>" . $friend["friend"] . "</a></td>";
-								echo "<td class='text-right'><a href='delete-friend.php?friend=" . $friend["friend"] . "' class='text-danger font-weight-bold'>&times;</a></td>";
+								echo "<td class='text-right'><a href='#delete-friend' data-toggle='modal' data-target='#delete-friend' onclick='removeFriend(\"" . $friend["friend"] . "\")' class='text-danger font-weight-bold'>&times;</a></td>";
 								echo "</tr>";
 							}
 						?>
@@ -173,7 +181,6 @@
 			</div>
 		</div>
 	</div>
-	
 	<div class="modal fade" id="add-friend" tabindex="-1">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -196,6 +203,28 @@
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
 						<button type="submit" class="btn btn-success">Add</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="delete-friend" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Remove Friend</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<form method="POST" action="delete-friend.php">
+					<div class="modal-body">
+						Remove friend <span id="delete-friend-target-text"></span>?
+					</div>
+					<input type="text" hidden id="delete-friend-target" name="friend" class="form-control" />
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-danger">Remove</button>
 					</div>
 				</form>
 			</div>
