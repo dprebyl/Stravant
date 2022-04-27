@@ -6,7 +6,12 @@
 	$activity = $db->query("SELECT *, ST_AsText(gps_track) AS gps_track
 							FROM activity
 							WHERE activity_id = ? AND username = ?", // TODO: Also allow viewing activities of friends
-							[$_GET["id"], $_SESSION["username"]])[0];
+							[$_GET["id"], $_SESSION["username"]]);
+	if (count($activity) == 0) {
+		die("Activity does not belong to user");
+	}
+	$activity = $activity[0];
+	$categories = $db->query("SELECT name, color from category_assignment natural join category where activity_id=?", [$activity["activity_id"]]);
 
 	// Convert GPS track from "LINESTRING(lat lon,lat lon,...)" to array
 	$coords = [];
@@ -26,9 +31,83 @@
 	<script src="libs/jquery.slim.min.js"></script>
 	<script src="libs/popper.min.js"></script>
 	<script src="libs/bootstrap.min.js"></script>
+	<script src="libs/autoComplete.min.js"></script>
 	<script src="libs/leaflet.js"></script>
 </head>
 <body class="pb-4">
+	<script>
+		window.onload = function () {
+			let categories = {};
+			fetch("get-categories.php").then((source) => source.json()).then(function(data) {
+				categories = data;
+				let autoCompleteJS = new autoComplete({
+					selector: "#categories", 
+					placeHolder: "category",
+					data: {
+							src: categories,
+							keys: ["name"],
+							filter: (list) => {
+								let current = document.getElementById("categories").value.split(", ");
+								let f = list.filter(c => current.indexOf(c.match) == -1);
+								return f;
+							}
+						},
+					resultsList: {
+						element: (list, data) => {
+							list.style="overflow-y: auto; overflow-x: hidden; height: 150px; width: 100%";
+						},
+						noResults: true,
+						maxResults: 100000,
+						tabSelect: true,
+						destination: "#categories",
+
+					},
+					resultItem: {
+						element: (item, data) => {
+							item.innerHTML = `
+							<span style="white-space: nowrap; width: 12em;">
+							${data.value.name}
+							</span>`;
+							item.classList.add("list-group-item");
+							item.style.color = data.value.color;
+						}
+					},
+					events: {
+						input: {
+							selection(event) {
+								const feedback = event.detail;
+								const input = autoCompleteJS.input;
+								// Trim selected Value
+								console.log(feedback.selection);
+								const selection = feedback.selection.match.trim();
+								// Split query into array and trim each value
+								const query = input.value.split(",").map(item => item.trim());
+								// Remove last query
+								query.pop();
+								// Add selected value
+								query.push(selection);
+								// Replace Input value with the new query
+								input.value = query.join(", ") + ", ";
+							}
+						},
+						focus: () => {
+							if (autoCompleteJS.input.value.length) autoCompleteJS.start();
+						},
+					},
+					query: (query) => {
+						// Split query into array
+						const querySplit = query.split(",");
+						// Get last query value index
+						const lastQuery = querySplit.length - 1;
+						// Trim new query
+						const newQuery = querySplit[lastQuery].trim();
+
+						return newQuery;
+					},
+				});
+			});
+		};
+	</script>
 	<nav class="navbar navbar-expand navbar-light bg-light mb-2">
 		<a class="navbar-brand" href="home.php">
 			<img src="logo.png" alt="Stravan't" height="30">
@@ -122,7 +201,18 @@
 					</li>
 					<li class="list-group-item">
 						<b>Categories</b>
-						<div>TODO</div>
+						<div>
+							<?php
+								$i = 0;
+								foreach ($categories as $category) {
+									echo "<span style='color:" . $category["color"] . "'>" . $category["name"] . "</span>";
+									if ($i < count($categories) - 1) {
+										echo ", ";
+									}
+									$i++;
+								}
+							?>
+						</div>
 					</li>
 					<li class="list-group-item">
 						<b>Description</b>
@@ -132,7 +222,6 @@
 			</div>
 		</div>
 	</div>
-
 	<div class="modal fade" id="edit" tabindex="-1">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -150,8 +239,8 @@
 							<input type="text" class="form-control" id="name" name="name" value="<?=$activity["name"]?>">
 						</div>
 						<div class="form-group">
-							<label for="categories">Categories (comma separated):</label>
-							<input type="text" class="form-control" id="categories" name="categories" value="TODO">
+							<label for="categories">Categories:</label>
+							<input type="text" autocomplete="off" class="form-control" id="categories" name="categories" value="<?=implode(", ", array_map(fn($cat) => $cat["name"], $categories))?>">
 						</div>
 						<div class="form-group">
 							<label for="description">Description:</label>
