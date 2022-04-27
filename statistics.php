@@ -40,7 +40,7 @@
 		<div class="row">
 			<div class="col">
 				<h1>
-					Records and statistics
+					Records
 				</h1>
 			</div>
 		</div>
@@ -49,7 +49,7 @@
 			<div class="col">
 			<table class="table">
 				<thead>
-					<th>Statistic</th>
+					<th>Record</th>
 					<th>User</th>
 					<th>Activity</th>
 					<th></th>
@@ -57,32 +57,60 @@
 				<tbody>
 					<?php
 						echo "<tr>";
-						$dist = $db->query("select * from activity as act join friendship as fr on act.username=fr.friend where username=? or username in (select friend from friendship where user=?) order by act.miles desc", [$_SESSION["username"], $_SESSION["username"]])[0];
+						$dist = $db->query("select * from activity as act where username=? or username in (select friend from friendship where user=?) order by act.miles desc", [$_SESSION["username"], $_SESSION["username"]])[0];
 						echo "<td>Greatest Distance</td>";
 						echo "<td>" . $dist["username"] . "</td>";
 						echo "<td>" . $dist["name"] . "</td>";
 						echo "<td>" . $dist["miles"] . "</td>";
 						echo "</tr>";
 						echo "<tr>";
-						$dist = $db->query("select * from activity as act join friendship as fr on act.username=fr.friend where username=? or username in (select friend from friendship where user=?) order by act.miles asc", [$_SESSION["username"], $_SESSION["username"]])[0];
+						$dist = $db->query("select * from activity as act where username=? or username in (select friend from friendship where user=?) order by act.miles asc", [$_SESSION["username"], $_SESSION["username"]])[0];
 						echo "<td>Lowest Distance</td>";
 						echo "<td>" . $dist["username"] . "</td>";
 						echo "<td>" . $dist["name"] . "</td>";
 						echo "<td>" . $dist["miles"] . "</td>";
 						echo "</tr>";
 						echo "<tr>";
-						$dist = $db->query("select * from activity as act join friendship as fr on act.username=fr.friend where username=? or username in (select friend from friendship where user=?) order by act.duration desc", [$_SESSION["username"], $_SESSION["username"]])[0];
+						$dist = $db->query("select * from activity as act where username=? or username in (select friend from friendship where user=?) order by act.duration desc", [$_SESSION["username"], $_SESSION["username"]])[0];
 						echo "<td>Greatest Duration</td>";
 						echo "<td>" . $dist["username"] . "</td>";
 						echo "<td>" . $dist["name"] . "</td>";
 						echo "<td>" . $dist["duration"] . "</td>";
 						echo "</tr>";
 						echo "<tr>";
-						$dist = $db->query("select * from activity as act join friendship as fr on act.username=fr.friend where username=? or username in (select friend from friendship where user=?) order by act.duration asc", [$_SESSION["username"], $_SESSION["username"]])[0];
+						$dist = $db->query("select * from activity as act where username=? or username in (select friend from friendship where user=?) order by act.duration asc", [$_SESSION["username"], $_SESSION["username"]])[0];
 						echo "<td>Lowest Duration</td>";
 						echo "<td>" . $dist["username"] . "</td>";
 						echo "<td>" . $dist["name"] . "</td>";
 						echo "<td>" . $dist["duration"] . "</td>";
+						echo "</tr>";
+						echo "<tr>";
+						$dist = $db->query("select username, avg(miles) as avg_miles from activity as act group by username having username=? or username in (select friend from friendship where user=?) order by avg_miles desc;", [$_SESSION["username"], $_SESSION["username"]])[0];
+						echo "<td>Greatest Average Distance</td>";
+						echo "<td>" . $dist["username"] . "</td>";
+						echo "<td></td>";
+						echo "<td>" . $dist["avg_miles"] . "</td>";
+						echo "</tr>";
+						echo "<tr>";
+						$dist = $db->query("select username, avg(miles) as avg_miles from activity as act group by username having username=? or username in (select friend from friendship where user=?) order by avg_miles asc;", [$_SESSION["username"], $_SESSION["username"]])[0];
+						echo "<td>Lowest Average Distance</td>";
+						echo "<td>" . $dist["username"] . "</td>";
+						echo "<td></td>";
+						echo "<td>" . $dist["avg_miles"] . "</td>";
+						echo "</tr>";
+						echo "<tr>";
+						$dist = $db->query("select username, avg(duration) as avg_dur from activity as act group by username having username=? or username in (select friend from friendship where user=?) order by avg_dur desc;", [$_SESSION["username"], $_SESSION["username"]])[0];
+						echo "<td>Greatest Average Duration</td>";
+						echo "<td>" . $dist["username"] . "</td>";
+						echo "<td></td>";
+						echo "<td>" . $dist["avg_dur"] . "</td>";
+						echo "</tr>";
+						echo "<tr>";
+						$dist = $db->query("select username, avg(duration) as avg_dur from activity as act group by username having username=? or username in (select friend from friendship where user=?) order by avg_dur asc;", [$_SESSION["username"], $_SESSION["username"]])[0];
+						echo "<td>Lowest Average Duration</td>";
+						echo "<td>" . $dist["username"] . "</td>";
+						echo "<td></td>";
+						echo "<td>" . $dist["avg_dur"] . "</td>";
 						echo "</tr>";
 					?>
 				</tbody>
