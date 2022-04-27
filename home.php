@@ -68,7 +68,11 @@
 					<tbody>
 						<?php
 							// TODO: Maybe join could be used here to get color of a category or something, also could double-check friendship
-							$activities = $db->query("SELECT activity_id, name, start_time, miles, duration FROM activity WHERE username = ?", [$username]);
+							if (isset($_GET["category"])) {
+								$activities = $db->query("SELECT act.activity_id, act.name, act.start_time, act.miles, act.duration FROM activity as act join category_assignment as ca on act.activity_id=ca.activity_id join category as cat on cat.name=ca.name WHERE act.username = ? and cat.name=?", [$username, $_GET["category"]]);
+							} else {
+								$activities = $db->query("SELECT activity_id, name, start_time, miles, duration FROM activity WHERE username = ?", [$username]);
+							}
 							foreach ($activities as $activity) {
 								echo "<tr>";
 								echo "<td>" . date("n/d/y g:ia", strtotime($activity["start_time"])) . "</td>";

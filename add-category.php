@@ -11,7 +11,6 @@
 		} else {
 			if (!empty($_POST["original-category"])) {
 				// Editing a category
-				// TODO: update activities that reference this category by name
 				
 				// get activities with this category
 				$activities = $db->query("SELECT cat.activity_id from category_assignment as cat join activity as act on cat.activity_id=act.activity_id where act.username=? and cat.name=?", [$_SESSION["username"], $_POST["original-category"]]);
