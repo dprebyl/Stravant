@@ -82,18 +82,14 @@
 					</tbody>
 				</table>
 			</div>
-<<<<<<< HEAD
 			<script>
 				function removeFriend(friend){
 					document.getElementById("delete-friend-target").innerText=friend;
 					document.getElementById("delete-friend-form").action = "delete-friend.php?friend=" + friend; 
 				}
 			</script>
-			<div class="col-sm-4">
-=======
 			<!-- TODO: Display these horizontally on small screens https://stackoverflow.com/questions/65222546/can-bootstrap-columns-be-vertically-stacked -->
 			<div class="col-lg-4">
->>>>>>> upstream
 				<h1>
 					Friends
 					<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#add-friend">Add</a>
