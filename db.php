@@ -4,6 +4,9 @@
 
 	// Start the session to keep track of who's logged in
 	session_start();
+    function ensure_logged_in() {
+        if (empty($_SESSION["username"])) header("Location: index.php");
+    }
 	
 	class DBConn {
 		private $conn;
@@ -20,9 +23,13 @@
 				$stmt->execute($parameters);
 				$stmt->setFetchMode(PDO::FETCH_ASSOC);
 
-				if (strtoupper(explode(' ',trim($query))[0]) == "SELECT") {
-					return $stmt->fetchAll(); // Return results for select statements
+                $type = strtoupper(explode(' ',trim($query))[0]);
+				if ($type == "SELECT") { // Return results for select statements
+					return $stmt->fetchAll(); 
 				}
+                elseif ($type == "INSERT") { // Return primary key of row inserted
+                    return $this->conn->lastInsertId();
+                }
 				return true;
 			}
 			catch (PDOException $e) { // Invalid SQL statement (at least that's usually the problem)

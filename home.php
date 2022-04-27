@@ -1,11 +1,8 @@
 <!DOCTYPE html>
 <?php
 	require "db.php";
-	if (!isset($_SESSION["username"])) {
-		header("Location: index.php");
-		return;
-	}
-	
+	ensure_logged_in();
+
 	if (isset($_GET["friend"])) {
 		// TODO: Check the friend is valid. If so, display the friend's activities and categories, but read only (no delete)
 		$username = $_GET["friend"];
@@ -23,14 +20,15 @@
 	<title>Stravan't</title>
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="libs/bootstrap.min.css">
 	<script src="libs/jquery.slim.min.js"></script>
 	<script src="libs/popper.min.js"></script>
 	<script src="libs/bootstrap.min.js"></script>
 </head>
-<body>
-	<nav class="navbar navbar-expand navbar-light bg-light">
+<body class="pb-4">
+	<nav class="navbar navbar-expand navbar-light bg-light mb-2">
 		<a class="navbar-brand" href="home.php">
 			<img src="logo.png" alt="Stravan't" height="30">
 		</a>
@@ -55,7 +53,7 @@
 	</nav>
 	<div class="container">
 		<div class="row">
-			<div class="col-sm-8">
+			<div class="col-lg-8">
 				<h1>
 					<?=isset($_GET["category"]) ? $_GET["category"] : "All"?> activities of <?=$username?>
 					<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#upload">Upload</a>
@@ -69,25 +67,22 @@
 					</thead>
 					<tbody>
 						<?php
-							// TODO: SQL, maybe join could be used here to get color of a category or something
-							$activities = [
-								["id" => 1, "start_time" => time(), "name" => "Foo", "miles" => 4.2, "duration" => 3600],
-								["id" => 2, "start_time" => time(), "name" => "Bar", "miles" => 6.9, "duration" => 7200],
-								["id" => 3, "start_time" => time(), "name" => "Baz", "miles" => 12, "duration" => 9600],
-							];
+							// TODO: Maybe join could be used here to get color of a category or something, also could double-check friendship
+							$activities = $db->query("SELECT activity_id, name, start_time, miles, duration FROM activity WHERE username = ?", [$username]);
 							foreach ($activities as $activity) {
 								echo "<tr>";
-								echo "<td>" . date("n/d/y g:ia", $activity["start_time"]) . "</td>";
-								echo "<td><a href='view.php?id=" . $activity["id"] . "'>" . $activity["name"] . "</a></td>";
-								echo "<td>" . $activity["miles"] . "</td>";
+								echo "<td>" . date("n/d/y g:ia", strtotime($activity["start_time"])) . "</td>";
+								echo "<td><a href='view.php?id=" . $activity["activity_id"] . "'>" . $activity["name"] . "</a></td>";
+								echo "<td>" . number_format($activity["miles"], 2) . " mi</td>";
 								echo "<td>" . gmdate("G:i", $activity["duration"]) . "</td>";
-								echo "<td class='text-right'><a href='delete-activity.php?activity=" . $activity["id"] . "' class='text-danger font-weight-bold'>&times;</a></td>";
+								echo "<td class='text-right'><a href='delete-activity.php?activity=" . $activity["activity_id"] . "' class='text-danger font-weight-bold'>&times;</a></td>";
 								echo "</tr>";
 							}
 						?>
 					</tbody>
 				</table>
 			</div>
+<<<<<<< HEAD
 			<script>
 				function removeFriend(friend){
 					document.getElementById("delete-friend-target").innerText=friend;
@@ -95,6 +90,10 @@
 				}
 			</script>
 			<div class="col-sm-4">
+=======
+			<!-- TODO: Display these horizontally on small screens https://stackoverflow.com/questions/65222546/can-bootstrap-columns-be-vertically-stacked -->
+			<div class="col-lg-4">
+>>>>>>> upstream
 				<h1>
 					Friends
 					<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#add-friend">Add</a>
