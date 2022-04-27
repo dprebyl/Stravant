@@ -1,5 +1,6 @@
 <?php
 	require_once "db.php";
+	ensure_logged_in();
 
 	if (isset($_POST["category-name"])) {
 		$results = $db->query("select * from category where username=? and name=?", [$_SESSION["username"], $_POST["category-name"]]);

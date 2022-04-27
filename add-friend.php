@@ -1,5 +1,6 @@
 <?php
 	require_once "db.php";
+	ensure_logged_in();
 
 	if (isset($_POST["friend"])) {
 		$results = $db->query("select * from user where username = ?", [$_POST["friend"]]);
