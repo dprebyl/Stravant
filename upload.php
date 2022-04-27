@@ -38,6 +38,6 @@
                 VALUES (?, ?, ?, ?, ?, ST_LineStringFromText(?, 4326))", 
         [$_SESSION["username"], $name, $duration, $description, substr($start, 0, 20), $linestring]);
 	
-	if ($id) header("Location: view.php?activity=" . $id);
+	if ($id) header("Location: view.php?id=" . $id);
     else die("Something went wrong");
 ?>
