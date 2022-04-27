@@ -79,7 +79,7 @@
 								echo "<td><a href='view.php?id=" . $activity["activity_id"] . "'>" . $activity["name"] . "</a></td>";
 								echo "<td>" . number_format($activity["miles"], 2) . " mi</td>";
 								echo "<td>" . gmdate("G:i", $activity["duration"]) . "</td>";
-								echo "<td class='text-right'><a href='delete-activity.php?activity=" . $activity["activity_id"] . "' class='text-danger font-weight-bold'>&times;</a></td>";
+								echo "<td class='text-right'><a href='#delete-activity' data-toggle='modal' data-target='#delete-activity' onclick='deleteActivity(\"" . $activity["activity_id"] . "\", \"" . $activity["name"] . "\")' class='text-danger font-weight-bold'>&times;</a></td>";
 								echo "</tr>";
 							}
 						?>
@@ -94,6 +94,10 @@
 				function deleteCategory(category){
 					document.getElementById("delete-category-target-text").innerText=category;
 					document.getElementById("delete-category-target").value = category;
+				}
+				function deleteActivity(activity, name){
+					document.getElementById("delete-activity-target-text").innerText=name;
+					document.getElementById("delete-activity-target").value = activity;
 				}
 				function updateCategory(category, color){
 					document.getElementById("category-name").value=category;
@@ -243,6 +247,28 @@
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
 						<button type="submit" class="btn btn-danger">Remove</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="delete-activity" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Delete activity</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<form method="POST" action="delete-activity.php">
+					<div class="modal-body">
+						Delete activity <span id="delete-activity-target-text"></span>?
+					</div>
+					<input type="text" hidden id="delete-activity-target" name="activity" class="form-control" />
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-danger">Delete</button>
 					</div>
 				</form>
 			</div>
