@@ -42,7 +42,51 @@
 				<h1>
 					Records and statistics
 				</h1>
-				TODO: Things like longest activity, excuses to use order by and group by
+			</div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col">
+			<table class="table">
+				<thead>
+					<th>Statistic</th>
+					<th>User</th>
+					<th>Activity</th>
+					<th></th>
+				</thead>
+				<tbody>
+					<?php
+						echo "<tr>";
+						$dist = $db->query("select act.miles, act.username, act.name from activity as act join friendship as fr on act.username=fr.friend where fr.user=? or act.username=? order by act.miles asc", [$_SESSION["username"], $_SESSION["username"]])[0];
+						echo "<td>Greatest Distance</td>";
+						echo "<td>" . $dist["username"] . "</td>";
+						echo "<td>" . $dist["name"] . "</td>";
+						echo "<td>" . $dist["miles"] . "</td>";
+						echo "</tr>";
+						echo "<tr>";
+						$dist = $db->query("select act.miles, act.username, act.name from activity as act join friendship as fr on act.username=fr.friend where fr.user=? or act.username=? order by act.miles desc", [$_SESSION["username"], $_SESSION["username"]])[0];
+						echo "<td>Lowest Distance</td>";
+						echo "<td>" . $dist["username"] . "</td>";
+						echo "<td>" . $dist["name"] . "</td>";
+						echo "<td>" . $dist["miles"] . "</td>";
+						echo "</tr>";
+						echo "<tr>";
+						$dist = $db->query("select act.duration, act.username, act.name from activity as act join friendship as fr on act.username=fr.friend where fr.user=? or act.username=? order by act.duration asc", [$_SESSION["username"], $_SESSION["username"]])[0];
+						echo "<td>Greatest Duration</td>";
+						echo "<td>" . $dist["username"] . "</td>";
+						echo "<td>" . $dist["name"] . "</td>";
+						echo "<td>" . $dist["duration"] . "</td>";
+						echo "</tr>";
+						echo "<tr>";
+						$dist = $db->query("select act.duration, act.username, act.name from activity as act join friendship as fr on act.username=fr.friend where fr.user=? or act.username=? order by act.duration desc", [$_SESSION["username"], $_SESSION["username"]])[0];
+						echo "<td>Lowest Duration</td>";
+						echo "<td>" . $dist["username"] . "</td>";
+						echo "<td>" . $dist["name"] . "</td>";
+						echo "<td>" . $dist["duration"] . "</td>";
+						echo "</tr>";
+					?>
+				</tbody>
+			</table>
 			</div>
 		</div>
 	</div>

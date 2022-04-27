@@ -240,7 +240,7 @@
 						</div>
 						<div class="form-group">
 							<label for="categories">Categories:</label>
-							<input type="text" autocomplete="off" class="form-control" id="categories" name="categories" value="<?=implode(", ", array_map(fn($cat) => $cat["name"], $categories))?>">
+							<input type="text" autocomplete="off" class="form-control" id="categories" name="categories" value="<?=implode(", ", array_map(function($cat) {return $cat["name"]; }, $categories))?>">
 						</div>
 						<div class="form-group">
 							<label for="description">Description:</label>

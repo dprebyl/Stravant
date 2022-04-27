@@ -1,9 +1,6 @@
 <?php
     require "db.php";
 	ensure_logged_in();
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
     var_dump($_POST, $_SESSION);
     // Ensure the activity belongs to the user
     if (count($db->query("SELECT 1 FROM activity WHERE activity_id = ? AND username = ?", 
