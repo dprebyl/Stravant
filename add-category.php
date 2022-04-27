@@ -11,6 +11,7 @@
 		} else {
 			if (!empty($_POST["original-category"])) {
 				// Editing a category
+				// TODO: update activities that reference this category by name
 				$db->query("UPDATE category set name=?, color=? where name=? and username=?", [$_POST["categoy-name"], $_POST["color"], $_POST["original-category"], $_SESSION["username"]]);
 			} else {
 				// Creating a category
