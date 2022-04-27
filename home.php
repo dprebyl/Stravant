@@ -91,6 +91,14 @@
 					document.getElementById("delete-category-target-text").innerText=category;
 					document.getElementById("delete-category-target").value = category;
 				}
+				function updateCategory(category, color){
+					document.getElementById("categoy-name").value=category;
+					document.getElementById("categoy-name").innerText=category;
+					document.getElementById("color").innerText=color;
+					document.getElementById("color").value=color;
+					document.getElementById("original-category").value=category;
+					document.getElementById("delete-category-target").value = category;
+				}
 			</script>
 			<!-- TODO: Display these horizontally on small screens https://stackoverflow.com/questions/65222546/can-bootstrap-columns-be-vertically-stacked -->
 			<div class="col-lg-4">
@@ -151,8 +159,8 @@
 								echo "<tr>";
 								$url = "home.php?category=" . $category["name"];
 								if (isset($_GET["friend"])) $url .= "&friend=" . $_GET["friend"];
-								echo "<td><a href='$url'>" . $category["name"] . "</td>";
-								echo "<td>" . $category["color"] . "</td>";
+								echo "<td><a href='$url' style='color:" . $category["color"] ."'>" . $category["name"] . "</td>";
+								echo "<td class='text-right'><a href='#add-category' data-toggle='modal' data-target='#add-category' onclick='updateCategory(\"" . $category["name"] . "\", \"" . $category["color"] . "\")'>edit</a></td>";
 								echo "<td class='text-right'><a href='#delete-category' data-toggle='modal' data-target='#delete-category' onclick='deleteCategory(\"" . $category["name"] . "\")' class='text-danger font-weight-bold'>&times;</a></td>";
 								echo "</tr>";
 							}
@@ -278,6 +286,7 @@
 							<label for="color">Color:</label>
 							<input type="color" class="form-control" id="color" name="color">
 						</div>
+						<input type="text" hidden id="original-category" name="original-category" class="form-control" />
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
