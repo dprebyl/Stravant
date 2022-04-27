@@ -92,8 +92,8 @@
 					document.getElementById("delete-category-target").value = category;
 				}
 				function updateCategory(category, color){
-					document.getElementById("categoy-name").value=category;
-					document.getElementById("categoy-name").innerText=category;
+					document.getElementById("category-name").value=category;
+					document.getElementById("category-name").innerText=category;
 					document.getElementById("color").innerText=color;
 					document.getElementById("color").value=color;
 					document.getElementById("original-category").value=category;
@@ -140,7 +140,7 @@
 					<thead>
 						<tr>
 							<th>Category</th>
-							<th>Color</th>
+							<th></th>
 							<th></th>
 						</tr>
 					</thead>
@@ -279,8 +279,8 @@
 				<form method="POST" action="add-category.php">
 					<div class="modal-body">
 						<div class="form-group">
-							<label for="categoy-name">Name:</label>
-							<input type="text" class="form-control" id="categoy-name" name="categoy-name">
+							<label for="category-name">Name:</label>
+							<input type="text" class="form-control" id="category-name" name="category-name">
 						</div>
 						<div class="form-group">
 							<label for="color">Color:</label>
