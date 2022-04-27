@@ -87,6 +87,10 @@
 					document.getElementById("delete-friend-target-text").innerText=friend;
 					document.getElementById("delete-friend-target").value = friend;
 				}
+				function deleteCategory(category){
+					document.getElementById("delete-category-target-text").innerText=category;
+					document.getElementById("delete-category-target").value = category;
+				}
 			</script>
 			<!-- TODO: Display these horizontally on small screens https://stackoverflow.com/questions/65222546/can-bootstrap-columns-be-vertically-stacked -->
 			<div class="col-lg-4">
@@ -134,20 +138,22 @@
 					</thead>
 					<tbody>
 						<?php
-							// TODO
-							// $categories = $db->query("SELECT name, color FROM category WHERE username = ?", [$username]);
-							$categories = [
-								["name" => "Foo", "color" => "red"],
-								["name" => "Bar", "color" => "green"],
-								["name" => "Baz", "color" => "blue"],
-							];
+							if (isset($_SESSION["category_error"])) {
+								echo '<div class="alert alert-danger" role="alert">';
+								echo $_SESSION["category_error"] . ".";
+								echo "</div>";
+								unset($_SESSION["category_error"]);
+							}
+						?>
+						<?php
+							$categories = $db->query("SELECT name, color FROM category WHERE username = ?", [$username]);
 							foreach ($categories as $category) {
 								echo "<tr>";
 								$url = "home.php?category=" . $category["name"];
 								if (isset($_GET["friend"])) $url .= "&friend=" . $_GET["friend"];
 								echo "<td><a href='$url'>" . $category["name"] . "</td>";
 								echo "<td>" . $category["color"] . "</td>";
-								echo "<td class='text-right'><a href='delete-category.php?category=" . $category["name"] . "' class='text-danger font-weight-bold'>&times;</a></td>";
+								echo "<td class='text-right'><a href='#delete-category' data-toggle='modal' data-target='#delete-category' onclick='deleteCategory(\"" . $category["name"] . "\")' class='text-danger font-weight-bold'>&times;</a></td>";
 								echo "</tr>";
 							}
 						?>
@@ -230,6 +236,28 @@
 			</div>
 		</div>
 	</div>
+	<div class="modal fade" id="delete-category" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Delete Category</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<form method="POST" action="delete-category.php">
+					<div class="modal-body">
+						Delete category <span id="delete-category-target-text"></span>?
+					</div>
+					<input type="text" hidden id="delete-category-target" name="category" class="form-control" />
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-danger">Delete</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 	
 	<div class="modal fade" id="add-category" tabindex="-1">
 		<div class="modal-dialog">
@@ -243,8 +271,8 @@
 				<form method="POST" action="add-category.php">
 					<div class="modal-body">
 						<div class="form-group">
-							<label for="name">Name:</label>
-							<input type="text" class="form-control" id="name" name="name">
+							<label for="categoy-name">Name:</label>
+							<input type="text" class="form-control" id="categoy-name" name="categoy-name">
 						</div>
 						<div class="form-group">
 							<label for="color">Color:</label>
