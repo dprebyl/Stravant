@@ -104,7 +104,9 @@
 								echo "<td>";
 								$i = 0;
 								foreach ($categories as $category) {
-									echo "<span style='color:" . $category["color"] . "'>" . $category["name"] . "</span>";
+									$url = "home.php?category=" . $category["name"];
+									if (isset($_GET["friend"])) $url .= "&friend=" . $_GET["friend"];
+									echo "<a href='" . $url . "'><span style='color:" . $category["color"] . "'>" . $category["name"] . "</a></span>";
 									if ($i < count($categories) - 1) {
 										echo ", ";
 									}
