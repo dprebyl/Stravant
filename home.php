@@ -112,7 +112,7 @@
 								}
 								echo "</td>";
 								echo "<td class='text-right'>";
-								if ($self) echo "<td class='text-right'><a href='#delete-activity' data-toggle='modal' data-target='#delete-activity' onclick='deleteActivity(\"" . $activity["activity_id"] . "\", \"" . $activity["name"] . "\")' class='text-danger font-weight-bold'>&times;</a></td>";
+								if ($self) echo "<a href='#delete-activity' data-toggle='modal' data-target='#delete-activity' onclick='deleteActivity(\"" . $activity["activity_id"] . "\", \"" . $activity["name"] . "\")' class='text-danger font-weight-bold'>&times;</a>";
 								echo "</td>";
 								echo "</tr>";
 							}
