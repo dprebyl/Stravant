@@ -15,7 +15,7 @@
 				
 				// get activities with this category
 				$activities = $db->query("SELECT cat.activity_id from category_assignment as cat join activity as act on cat.activity_id=act.activity_id where act.username=? and cat.name=?", [$_SESSION["username"], $_POST["original-category"]]);
-				$activities = array_map(fn($act) => $act["activity_id"], $activities);
+				$activities = array_map(function($act) {return $act["activity_id"];}, $activities);
 				// delete the existing assignments 
 				$db->query("DELETE from category_assignment where activity_id in (" . implode(", ", array_fill(0, count($activities), '?')) . ") and name=?", array_merge($activities, [$_POST["original-category"]]));
 				// rename category

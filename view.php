@@ -37,74 +37,72 @@
 <body class="pb-4">
 	<script>
 		window.onload = function () {
-			let categories = {};
-			fetch("get-categories.php").then((source) => source.json()).then(function(data) {
-				categories = data;
-				let autoCompleteJS = new autoComplete({
-					selector: "#categories", 
-					placeHolder: "category",
-					data: {
-							src: categories,
-							keys: ["name"],
-							filter: (list) => {
-								let current = document.getElementById("categories").value.split(", ");
-								let f = list.filter(c => current.indexOf(c.match) == -1);
-								return f;
-							}
-						},
-					resultsList: {
-						element: (list, data) => {
-							list.style="overflow-y: auto; overflow-x: hidden; height: 150px; width: 100%";
-						},
-						noResults: true,
-						maxResults: 100000,
-						tabSelect: true,
-						destination: "#categories",
-
-					},
-					resultItem: {
-						element: (item, data) => {
-							item.innerHTML = `
-							<span style="white-space: nowrap; width: 12em;">
-							${data.value.name}
-							</span>`;
-							item.classList.add("list-group-item");
-							item.style.color = data.value.color;
+			let categories = <?=json_encode($db->query("SELECT * FROM category where username=?;", [$_SESSION["username"]]))?>;
+			let autoCompleteJS = new autoComplete({
+				selector: "#categories", 
+				placeHolder: "category",
+				threshold: 0,
+				data: {
+						src: categories,
+						keys: ["name"],
+						filter: (list) => {
+							let current = document.getElementById("categories").value.split(", ");
+							let f = list.filter(c => current.indexOf(c.match) == -1);
+							return f;
 						}
 					},
-					events: {
-						input: {
-							selection(event) {
-								const feedback = event.detail;
-								const input = autoCompleteJS.input;
-								// Trim selected Value
-								console.log(feedback.selection);
-								const selection = feedback.selection.match.trim();
-								// Split query into array and trim each value
-								const query = input.value.split(",").map(item => item.trim());
-								// Remove last query
-								query.pop();
-								// Add selected value
-								query.push(selection);
-								// Replace Input value with the new query
-								input.value = query.join(", ") + ", ";
-							}
-						},
-						focus: () => {
-							if (autoCompleteJS.input.value.length) autoCompleteJS.start();
-						},
+				resultsList: {
+					element: (list, data) => {
+						list.style="overflow-y: auto; overflow-x: hidden; height: 150px; width: 100%";
 					},
-					query: (query) => {
-						// Split query into array
-						const querySplit = query.split(",");
-						// Get last query value index
-						const lastQuery = querySplit.length - 1;
-						// Trim new query
-						const newQuery = querySplit[lastQuery].trim();
+					noResults: true,
+					maxResults: 100000,
+					tabSelect: true,
+					destination: "#categories"
 
-						return newQuery;
+				},
+				resultItem: {
+					element: (item, data) => {
+						item.innerHTML = `
+						<span style="white-space: nowrap; width: 12em;">
+						${data.value.name}
+						</span>`;
+						item.classList.add("list-group-item");
+						item.style.color = data.value.color;
+					}
+				},
+				events: {
+					input: {
+						selection(event) {
+							const feedback = event.detail;
+							const input = autoCompleteJS.input;
+							// Trim selected Value
+							console.log(feedback.selection);
+							const selection = feedback.selection.match.trim();
+							// Split query into array and trim each value
+							const query = input.value.split(",").map(item => item.trim());
+							// Remove last query
+							query.pop();
+							// Add selected value
+							query.push(selection);
+							// Replace Input value with the new query
+							input.value = query.join(", ") + ", ";
+						}
 					},
-				});
+					focus: () => {
+						if (autoCompleteJS.input.value.length) autoCompleteJS.start();
+					},
+				},
+				query: (query) => {
+					// Split query into array
+					const querySplit = query.split(",");
+					// Get last query value index
+					const lastQuery = querySplit.length - 1;
+					// Trim new query
+					const newQuery = querySplit[lastQuery].trim();
+
+					return newQuery;
+				},
 			});
 		};
 	</script>
@@ -240,7 +238,7 @@
 						</div>
 						<div class="form-group">
 							<label for="categories">Categories:</label>
-							<input type="text" autocomplete="off" class="form-control" id="categories" name="categories" value="<?=implode(", ", array_map(fn($cat) => $cat["name"], $categories))?>">
+							<input type="text" autocomplete="off" class="form-control" id="categories" name="categories" value="<?=implode(", ", array_map(function($cat) {return $cat["name"]; }, $categories))?>">
 						</div>
 						<div class="form-group">
 							<label for="description">Description:</label>
