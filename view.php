@@ -5,10 +5,10 @@
 	
 	$activity = $db->query("SELECT *, ST_AsText(gps_track) AS gps_track
 							FROM activity
-							WHERE activity_id = ? AND username in (select friend from mutuals where user=?) ", // TODO: Also allow viewing activities of friends
+							WHERE activity_id = ? AND username in (select friend from mutuals where user=?) ", 
 							[$_GET["id"], $_SESSION["username"]]);
 	if (count($activity) == 0) {
-		die("Activity does not belong to user");
+		die("Activity does not belong to self or friend");
 	}
 	$activity = $activity[0];
 	$is_friend = $activity["username"] !== $_SESSION["username"];
