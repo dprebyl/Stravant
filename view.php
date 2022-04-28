@@ -53,7 +53,8 @@
 					},
 				resultsList: {
 					element: (list, data) => {
-						list.style="overflow-y: auto; overflow-x: hidden; height: 150px; width: 100%";
+						list.style="overflow-y: auto; overflow-x: hidden; width: 100%";
+						list.classList.add("list-group");
 					},
 					noResults: true,
 					maxResults: 100000,
@@ -64,7 +65,7 @@
 				resultItem: {
 					element: (item, data) => {
 						item.innerHTML = `
-						<span style="white-space: nowrap; width: 12em;">
+						<span style="white-space: nowrap; width: 100%;">
 						${data.value.name}
 						</span>`;
 						item.classList.add("list-group-item");
@@ -74,31 +75,30 @@
 				events: {
 					input: {
 						selection(event) {
+							// Convert to list
 							const feedback = event.detail;
 							const input = autoCompleteJS.input;
-							// Trim selected Value
-							console.log(feedback.selection);
 							const selection = feedback.selection.match.trim();
-							// Split query into array and trim each value
 							const query = input.value.split(",").map(item => item.trim());
-							// Remove last query
 							query.pop();
-							// Add selected value
 							query.push(selection);
-							// Replace Input value with the new query
 							input.value = query.join(", ") + ", ";
-						}
-					},
-					focus: () => {
-						if (autoCompleteJS.input.value.length) autoCompleteJS.start();
+							autoCompleteJS.start();
+							autoCompleteJS.open();
+						},
+						focus: () => {
+							autoCompleteJS.start();
+							autoCompleteJS.open();
+						},
 					},
 				},
+				trigger: (query) => {
+					return true;
+				},
 				query: (query) => {
-					// Split query into array
+					// Only query with last item
 					const querySplit = query.split(",");
-					// Get last query value index
 					const lastQuery = querySplit.length - 1;
-					// Trim new query
 					const newQuery = querySplit[lastQuery].trim();
 
 					return newQuery;
