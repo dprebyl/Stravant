@@ -2,18 +2,16 @@
 <?php
 	require "db.php";
 	ensure_logged_in();
-	ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 	
 	$activity = $db->query("SELECT *, ST_AsText(gps_track) AS gps_track
 							FROM activity
-							WHERE activity_id = ? AND username = ?", // TODO: Also allow viewing activities of friends
+							WHERE activity_id = ? AND username in (select friend from mutuals where user=?) ", // TODO: Also allow viewing activities of friends
 							[$_GET["id"], $_SESSION["username"]]);
 	if (count($activity) == 0) {
 		die("Activity does not belong to user");
 	}
 	$activity = $activity[0];
+	$is_friend = $activity["username"] !== $_SESSION["username"];
 	$categories = $db->query("SELECT cat.name, cat.color from category_assignment as ca join activity as act on ca.activity_id=act.activity_id join category as cat on ca.name=cat.name and act.username=cat.username where act.activity_id=?", [$activity["activity_id"]]);
 
 	// Convert GPS track from "LINESTRING(lat lon,lat lon,...)" to array
@@ -185,7 +183,9 @@ error_reporting(E_ALL);
 			<div class="col-lg-4">
 				<h1>
 					Details
+					<?php if (!$is_friend): ?>
 					<button type="button" class="btn btn-primary float-right mt-2" data-toggle="modal" data-target="#edit">Edit</a>
+					<?php endif; ?>
 				</h1>
 				<ul class="list-group">
 					<li class="list-group-item d-flex justify-content-between">
