@@ -2,16 +2,13 @@
 <?php
 	require "db.php";
 	ensure_logged_in();
-	ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 	
 	$activity = $db->query("SELECT *, ST_AsText(gps_track) AS gps_track
 							FROM activity
-							WHERE activity_id = ? AND username = ?", // TODO: Also allow viewing activities of friends
-							[$_GET["id"], $_SESSION["username"]]);
+							WHERE activity_id = ? AND (username = ? OR username IN (SELECT friend FROM friendship WHERE user = ?))",
+							[$_GET["id"], $_SESSION["username"], $_SESSION["username"]]);
 	if (count($activity) == 0) {
-		die("Activity does not belong to user");
+		die("Activity does not belong to self or friend");
 	}
 	$activity = $activity[0];
 	$categories = $db->query("SELECT cat.name, cat.color from category_assignment as ca join activity as act on ca.activity_id=act.activity_id join category as cat on ca.name=cat.name and act.username=cat.username where act.activity_id=?", [$activity["activity_id"]]);
