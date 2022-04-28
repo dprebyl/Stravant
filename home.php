@@ -2,6 +2,9 @@
 <?php
 	require "db.php";
 	ensure_logged_in();
+	ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	error_reporting(E_ALL);
 
 	if (isset($_GET["friend"]) && $_GET["friend"] != $_SESSION["username"]) {
 		$self = false;
@@ -79,23 +82,35 @@
 				<table class="table table-striped">
 					<thead>
 						<tr>
-							<th>Date/Time</th><th>Name</th><th>Distance</th><th>Duration</th><th></th>
+							<th>Date/Time</th><th>Name</th><th>Distance</th><th>Duration</th><th>Categories</th><th></th>
 						</tr>
 					</thead>
 					<tbody>
 						<?php
 							// TODO: Maybe join could be used here to get color of a category or something, also could double-check friendship
 							if (isset($_GET["category"])) {
-								$activities = $db->query("SELECT act.activity_id, act.name, act.start_time, act.miles, act.duration FROM activity as act join category_assignment as ca on act.activity_id=ca.activity_id join category as cat on cat.name=ca.name WHERE act.username = ? and cat.name=?", [$username, $_GET["category"]]);
+								$activities = $db->query("SELECT act.activity_id, act.name, act.start_time, act.miles, act.duration FROM activity as act join category_assignment as ca on act.activity_id=ca.activity_id join category as cat on cat.name=ca.name and cat.username=act.username WHERE act.username = ? and cat.name=?", [$username, $_GET["category"]]);
 							} else {
 								$activities = $db->query("SELECT activity_id, name, start_time, miles, duration FROM activity WHERE username = ?", [$username]);
 							}
 							foreach ($activities as $activity) {
+								$categories = $db->query("SELECT cat.color, cat.name from activity as act join category_assignment as ca on act.activity_id=ca.activity_id join category as cat on ca.name=cat.name and cat.username=act.username where act.activity_id=?", [$activity["activity_id"]]);
+
 								echo "<tr>";
 								echo "<td>" . date("n/d/y g:ia", strtotime($activity["start_time"])) . "</td>";
 								echo "<td><a href='view.php?id=" . $activity["activity_id"] . "'>" . $activity["name"] . "</a></td>";
 								echo "<td>" . number_format($activity["miles"], 2) . " mi</td>";
 								echo "<td>" . gmdate("G:i", $activity["duration"]) . "</td>";
+								echo "<td>";
+								$i = 0;
+								foreach ($categories as $category) {
+									echo "<span style='color:" . $category["color"] . "'>" . $category["name"] . "</span>";
+									if ($i < count($categories) - 1) {
+										echo ", ";
+									}
+									$i++;
+								}
+								echo "</td>";
 								echo "<td class='text-right'>";
 								if ($self) echo "<td class='text-right'><a href='#delete-activity' data-toggle='modal' data-target='#delete-activity' onclick='deleteActivity(\"" . $activity["activity_id"] . "\", \"" . $activity["name"] . "\")' class='text-danger font-weight-bold'>&times;</a></td>";
 								echo "</td>";
