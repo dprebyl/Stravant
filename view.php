@@ -200,6 +200,10 @@
 						<b>Duration</b>
 						<span><?=gmdate("G:i:s", $activity["duration"])?></span>
 					</li>
+					<li class="list-group-item d-flex justify-content-between">
+						<b>Average speed</b>
+						<span><?=number_format($activity["miles"]/$activity["duration"]*3600, 2)?> mph</span>
+					</li>
 					<li class="list-group-item">
 						<b>Categories</b>
 						<div>
