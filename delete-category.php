@@ -7,6 +7,7 @@
 		if (count($results) == 0) {
 			$_SESSION["category_error"] = "Category no longer exists";
 		} else {
+			$db->query("delete from category_assignment where activity_id in (select activity_id from activity where username=?) and name=?", [$_SESSION["username"], $_POST["category"]]);
 			$db->query("delete from category where username=? and name=?", [$_SESSION["username"], $_POST["category"]]);
 		}
 	}
